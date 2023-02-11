@@ -166,7 +166,7 @@ app.get('/search_term', function(req, res) {
       for (let i = 0; i < queryTracks.length; i++) {
         // idList.push(queryTracks[i].id);
         idList = idList + `${queryTracks[i].id},`;
-        trackList.push([queryTracks[i].id, queryTracks[i].name, queryTracks[i].artists[0].name])
+        trackList.push(queryTracks[i])
       }
 
       var bodyToSend = [idList, trackList];
@@ -194,13 +194,11 @@ app.get('/audio_analysis', function(req, res) {
   request.get(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       bodyToSend = body;
-      console.log(body);
       res.send({
         'body': body
       });
     }
   });
-  console.log('audio analysis')
 
 });
 

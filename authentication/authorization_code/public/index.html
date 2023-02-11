@@ -7,12 +7,48 @@
       #login, #loggedin {
         display: none;
       }
+
       .text-overflow {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         width: 500px;
       }
+
+      .dropbtn {
+        /* background-color: #04AA6D;
+        color: white; */
+        padding: 16px;
+        font-size: 16px;
+        border: none;
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+      }
+
+      .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .dropdown-content a:hover {background-color: #ddd;}
+
+      .dropdown:hover .dropdown-content {display: block;}
+
+      .dropdown:hover .dropbtn {background-color: #3e8e41;}
     </style>
   </head>
 
@@ -28,7 +64,34 @@
         <div id="oauth">
         </div>
         <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
-        <button class="btn btn-default" id="search-for-tracks">Search for tracks that match 'Workout'</button>
+        <button class="btn btn-default" id="search-for-tracks">Search for tracks that match Genre</button>
+        <input class="btn btn-default" id="search-for-tracks-input"></input>
+        <button class="btn btn-default" id="clear">Clear</button>
+        <form id="selectPace" style="visibility: hidden;">  
+          <label> Select Pace </label>  
+          <select id="select">  
+            <option id="pace"></option>
+            <option id="pace">5:00</option>
+            <option id="pace">5:30</option>
+            <option id="pace">6:00</option>
+            <option id="pace">6:30</option>
+            <option id="pace">7:00</option>
+            <option id="pace">7:30</option>
+            <option id="pace">8:00</option>
+            <option id="pace">8:30</option>
+            <option id="pace">9:00</option>
+            <option id="pace">9:30</option>
+            <option id="pace">10:00</option>
+            <option id="pace">10:30</option>
+            <option id="pace">11:00</option>
+            <option id="pace">11:30</option>
+            <option id="pace">12:00</option>
+            <option id="pace">12:30</option>
+            <option id="pace">13:00</option>
+          </select>  
+        </form>  
+        <br>
+        <p id="demo"></p>
       </div>
     </div>
 
@@ -121,6 +184,8 @@
               $('#loggedin').hide();
           }
 
+          let songData = [];
+
           document.getElementById('obtain-new-token').addEventListener('click', function() {
             $.ajax({
               url: '/refresh_token',
@@ -136,18 +201,110 @@
             });
           }, false);
 
+          document.getElementById('search-for-tracks-input').addEventListener('input', updateValue);
+
+          let genre = '';
+
+          function updateValue(e) {
+            genre += e.data;
+          }
+
+          function clear() {
+            genre = '';
+            document.getElementById('search-for-tracks-input').value = '';
+          }
+
+          function filterPace(e) {
+            // get selected pace
+            const pace = e.target.value;
+            let filter = [];
+
+            // check pace and filter by BPM
+            if (pace === "5:00") {
+              filter = songData.filter(track => track.bpm >= 200);
+            } else if (pace === "5:30") {
+              filter = songData.filter(track => track.bpm > 195 && track.bpm < 200);
+            } else if (pace === "6:00") {
+              filter = songData.filter(track => track.bpm > 190 && track.bpm < 195);
+            } else if (pace === "6:30") {
+              // what do I do here
+            } else if (pace === "7:00") {
+              filter = songData.filter(track => track.bpm > 185 && track.bpm < 190);
+            } else if (pace === "7:30") {
+              filter = songData.filter(track => track.bpm > 180 && track.bpm < 185);
+            } else if (pace === "8:00") {
+              filter = songData.filter(track => track.bpm > 175 && track.bpm < 180);
+            } else if (pace === "8:30") {
+              filter = songData.filter(track => track.bpm > 170 && track.bpm < 175);
+            } else if (pace === "9:00") {
+              filter = songData.filter(track => track.bpm > 165 && track.bpm < 170);
+            } else if (pace === "9:30") {
+              filter = songData.filter(track => track.bpm > 160 && track.bpm < 165);
+            } else if (pace === "10:00") {
+              filter = songData.filter(track => track.bpm > 155 && track.bpm < 160);
+            } else if (pace === "10:30") {
+              filter = songData.filter(track => track.bpm > 150 && track.bpm < 155);
+            } else if (pace === "11:00") {
+              filter = songData.filter(track => track.bpm > 145 && track.bpm < 150);
+            } else if (pace === "11:30") {
+              filter = songData.filter(track => track.bpm > 140 && track.bpm < 145);
+            } else if (pace === "12:00") {
+              filter = songData.filter(track => track.bpm > 135 && track.bpm < 140);
+            } else if (pace === "12:30") {
+              filter = songData.filter(track => track.bpm > 130 && track.bpm < 135);
+            } else if (pace === "13:00") {
+              filter = songData.filter(track => track.bpm <= 130);
+            } else {
+              filter = songData;
+            }
+
+            // set display data
+            var demo = document.getElementById("demo");
+            var html = "<table border='1|1'>";
+
+            // table header
+            html+="<tr>";
+            html+="<td>"+"Track Name"+"</td>";
+            html+="<td>"+"Artists"+"</td>";
+            html+="<td>"+"BPM"+"</td>";
+            html+="</tr>";
+
+            // add a table row for each track
+            filter.forEach(song => {
+              html+="<tr>";
+              html+="<td>"+song['trackName']+"</td>";
+              html+="<td>"+song['artists'][0].name+"</td>";
+              html+="<td>"+song['bpm']+"</td>";
+              
+              html+="</tr>";
+            });
+
+            html+="</table>";
+
+            demo.innerHTML = html;
+          }
+
+          let genreTracks;
+
+          document.getElementById('clear').addEventListener('click', clear);
+
+          document.getElementById('select').addEventListener('change', filterPace);
+
           document.getElementById('search-for-tracks').addEventListener('click', function() {
+            // Clear display data
+            demo.innerHTML = '';
+
+            // get songs by genre
             $.ajax({
               url: '/search_term',
               data: {
-                'search_term': 'dance',
-                'genre': 'pop',
+                'genre': genre,
                 'access_token': access_token
               }
             })
             .done(function(data) {
-              console.log(data.body[0]);
-              console.log('search_term')
+              // get audio info by genreIds
+              genreTracks = data.body[1];
               $.ajax({
                 url: '/audio_analysis',
                 data: {
@@ -156,7 +313,73 @@
                 }
               })
               .done(function(data) {
-                console.log('audio_analysis')
+                let unsortedData = data.body.audio_features;
+
+                function sortById(a, b) {
+                  if ( a.id > b.id ){
+                    return -1;
+                  }
+                  if ( a.id < b.id ){
+                    return 1;
+                  }
+                  return 0;
+                }
+
+                function sortByBPM(a, b) {
+                  if ( a.bpm > b.bpm ){
+                    return -1;
+                  }
+                  if ( a.bpm < b.bpm ){
+                    return 1;
+                  }
+                  return 0;
+                }
+
+                // Sort data by IDs so we can get the right values for each track
+                let sortedAudio = unsortedData.sort(sortById);
+                let sortedGenre = genreTracks.sort(sortById);
+
+                // combine each track list into a single array
+                for (let i = 0; i < sortedAudio.length; i++) {
+                  songData.push({
+                    trackName: sortedGenre[i].name, 
+                    artists: sortedGenre[i].artists, 
+                    uri: sortedGenre[i].uri, 
+                    genreId: sortedGenre[i].id, 
+                    audioId: sortedAudio[i].id, 
+                    bpm: sortedAudio[i].tempo,
+                  });
+                }
+
+                // clear search term
+                clear();
+
+                // set display data
+                var demo = document.getElementById("demo");
+                var html = "<table border='1|1'>";
+
+                // table header
+                html+="<tr>";
+                html+="<td>"+"Track Name"+"</td>";
+                html+="<td>"+"Artists"+"</td>";
+                html+="<td>"+"BPM"+"</td>";
+                html+="</tr>";
+
+                // add a table row for each track
+                songData.sort(sortByBPM).forEach(song => {
+                  html+="<tr>";
+                  html+="<td>"+song['trackName']+"</td>";
+                  html+="<td>"+song['artists'][0].name+"</td>";
+                  html+="<td>"+song['bpm']+"</td>";
+                  
+                  html+="</tr>";
+                });
+
+                html+="</table>";
+
+                // show pace selector
+                document.getElementById('selectPace').style.visibility = "visible"
+                demo.innerHTML = html;
               });
             });
           }, false);
